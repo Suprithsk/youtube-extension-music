@@ -17,7 +17,11 @@ This Chrome extension allows users to toggle the playback speed of YouTube video
 
 ## Usage
 
-- While watching a YouTube video, press the designated keyboard shortcut (configured in the `manifest.json` file) to toggle the playback speed between 1x and 1.5x.
+- While watching a YouTube video, press **Ctrl+Shift+S** to toggle the playback speed:
+  - At any speed other than 1x, it snaps back to 1x.
+  - At 1x, it jumps to 1.5x.
+- A small overlay in the top-right corner briefly shows the new speed.
+- To change the shortcut, go to `chrome://extensions/shortcuts` and remap "Toggle playback speed between 1x and 1.5x".
 
 ## Development
 

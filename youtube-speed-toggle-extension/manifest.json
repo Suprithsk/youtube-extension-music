@@ -3,10 +3,23 @@
   "name": "YouTube Speed Toggle",
   "version": "1.0",
   "description": "Toggle YouTube video playback speed between 1x and 1.5x using a keyboard shortcut.",
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "permissions": ["storage"],
+  "commands": {
+    "toggle-speed": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S"
+      },
+      "description": "Toggle playback speed between 1x and 1.5x"
+    }
+  },
   "content_scripts": [
     {
       "matches": ["*://www.youtube.com/*"],
-      "js": ["src/content.js"]
+      "js": ["src/content.js"],
+      "css": ["src/styles.css"]
     }
   ],
   "icons": {

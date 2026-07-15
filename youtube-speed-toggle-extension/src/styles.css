@@ -1,1 +1,26 @@
-/* This file is intentionally left blank */
+#yt-speed-toggle-indicator {
+    position: fixed;
+    top: 12px;
+    right: 200px;
+    z-index: 99999;
+    padding: 4px 12px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+#yt-speed-toggle-indicator.visible {
+    opacity: 0.85;
+}
+
+#yt-speed-toggle-indicator.pulse {
+    opacity: 1;
+    transform: scale(1.15);
+    background: rgba(204, 0, 0, 0.9);
+}
