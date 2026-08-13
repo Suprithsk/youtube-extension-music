@@ -1,25 +1,26 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Speed Toggle",
-  "version": "1.0",
-  "description": "Toggle YouTube video playback speed between 1x and 1.5x using a keyboard shortcut.",
+  "name": "YouTube Auto Speed",
+  "version": "2.0",
+  "description": "Plays music videos at 1x; cycle everything else through 1x / 1.25x / 1.5x.",
+  "permissions": ["storage"],
   "background": {
     "service_worker": "src/background.js"
   },
-  "permissions": ["storage"],
   "commands": {
-    "toggle-speed": {
+    "cycle-speed": {
       "suggested_key": {
         "default": "Ctrl+Shift+S"
       },
-      "description": "Toggle playback speed between 1x and 1.5x"
+      "description": "Cycle speed (non-music videos): 1x / 1.25x / 1.5x"
     }
   },
   "content_scripts": [
     {
       "matches": ["*://www.youtube.com/*"],
       "js": ["src/content.js"],
-      "css": ["src/styles.css"]
+      "css": ["src/styles.css"],
+      "run_at": "document_start"
     }
   ],
   "icons": {
