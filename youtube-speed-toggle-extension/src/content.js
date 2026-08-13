@@ -113,10 +113,6 @@ const rememberCategory = (videoId, category) => {
 
 // --- speed badge ------------------------------------------------------------
 
-// How long the wordy "Music detected" label stays before collapsing to just
-// the speed, so the badge isn't a block of text the whole time.
-const LABEL_VISIBLE_MS = 4000;
-
 // Returns null before <body> exists, since this runs at document_start.
 const ensureBadge = () => {
     let badge = document.getElementById('yt-speed-toggle-indicator');
@@ -160,15 +156,6 @@ const updateBadge = ({ category = null, pulse = false } = {}) => {
     badge._label.textContent = badge._labelText || '';
     badge._rate.textContent = `${video.playbackRate}x`;
     badge.classList.add('visible');
-
-    // Expand for a new detection or a speed change, then settle back to the
-    // speed alone. Plain refreshes don't restart the timer.
-    if (pulse || badge._labelText !== badge._expandedFor) {
-        badge._expandedFor = badge._labelText;
-        badge.classList.add('expanded');
-        clearTimeout(badge._collapseTimer);
-        badge._collapseTimer = setTimeout(() => badge.classList.remove('expanded'), LABEL_VISIBLE_MS);
-    }
 
     if (pulse) {
         badge.classList.add('pulse');

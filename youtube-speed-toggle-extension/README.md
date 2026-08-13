@@ -8,7 +8,7 @@ A Chrome extension that sets YouTube playback speed automatically: **music video
 - **Ctrl+Shift+S** cycles non-music videos through **1x → 1.25x → 1.5x**. Your choice is remembered and used for the non-music videos that follow.
 - Music videos are pinned at 1x and ignore the shortcut.
 - Re-applies the speed when you move to the next video (YouTube resets it otherwise).
-- A small badge at the top of the page announces what was detected — `Music video detected 1x`, `Education detected 1.5x` — then collapses after 4 seconds to just the speed (`1.5x`) so it stays out of the way. It re-expands whenever the speed or video changes.
+- A small badge at the top of the page shows what was detected and the speed in use — `Music video detected 1x`, `Education detected 1.5x` — and stays visible while you watch.
 - Manual speed changes from YouTube's own menu are respected — the extension stops interfering a few seconds after the video loads.
 
 ## Installation
