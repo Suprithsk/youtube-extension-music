@@ -1,9 +1,11 @@
 {
   "manifest_version": 3,
   "name": "YouTube Auto Speed",
-  "version": "2.0",
-  "description": "Plays music videos at 1x; cycle everything else through 1x / 1.25x / 1.5x.",
-  "permissions": ["storage"],
+  "version": "2.1",
+  "description": "Plays music videos at 1x; cycle everything else through 1x / 1.25x / 1.5x. Blurs YouTube while you share your screen in Teams.",
+  "permissions": [
+    "storage"
+  ],
   "background": {
     "service_worker": "src/background.js"
   },
@@ -13,14 +15,53 @@
         "default": "Ctrl+Shift+S"
       },
       "description": "Cycle speed (non-music videos): 1x / 1.25x / 1.5x"
+    },
+    "toggle-blur": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+H"
+      },
+      "description": "Blur / unblur YouTube"
     }
   },
   "content_scripts": [
     {
-      "matches": ["*://www.youtube.com/*"],
-      "js": ["src/content.js"],
-      "css": ["src/styles.css"],
+      "matches": [
+        "*://www.youtube.com/*"
+      ],
+      "js": [
+        "src/content.js"
+      ],
+      "css": [
+        "src/styles.css"
+      ],
       "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://teams.cloud.microsoft/*",
+        "https://*.teams.microsoft.com/*",
+        "https://teams.live.com/*"
+      ],
+      "js": [
+        "src/teams-hook.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_origin_as_fallback": true
+    },
+    {
+      "matches": [
+        "https://teams.cloud.microsoft/*",
+        "https://*.teams.microsoft.com/*",
+        "https://teams.live.com/*"
+      ],
+      "js": [
+        "src/teams-relay.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_origin_as_fallback": true
     }
   ],
   "icons": {

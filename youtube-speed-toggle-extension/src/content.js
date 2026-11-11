@@ -256,3 +256,118 @@ setInterval(() => {
 }, 500);
 
 applyForCurrentVideo();
+
+// --- privacy blur -----------------------------------------------------------
+
+// Blur whenever this window isn't the one you're using (another app, another
+// tab, or Chrome's address bar). Set to false to blur only during a Teams share.
+const BLUR_ON_FOCUS_LOSS = true;
+// Mute while a Teams share is running, so "Include sound" doesn't broadcast it.
+const MUTE_WHILE_SHARING = true;
+
+let teamsSharing = false;
+let windowUnfocused = false;
+// Set by the shortcut or a click on the overlay; overrides the automatic state
+// until that state next changes.
+let manualBlur = null;
+let mutedForShare = false;
+
+const autoBlur = () => teamsSharing || windowUnfocused;
+
+// documentElement exists at document_start, so the overlay can go up before <body>.
+const ensureOverlay = () => {
+    let overlay = document.getElementById('yt-privacy-blur');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'yt-privacy-blur';
+        overlay._hint = document.createElement('div');
+        overlay._hint.className = 'yt-privacy-hint';
+        overlay.append(overlay._hint);
+        overlay.addEventListener('click', () => {
+            manualBlur = false;
+            renderBlur();
+        });
+    }
+    return overlay;
+};
+
+const renderBlur = () => {
+    const overlay = ensureOverlay();
+    // A fullscreen player sits above everything else on the page, so the
+    // overlay has to live inside it to cover it.
+    const host = document.fullscreenElement || document.documentElement;
+    if (overlay.parentNode !== host) host.appendChild(overlay);
+
+    overlay._hint.textContent = teamsSharing
+        ? 'Hidden while you share your screen. Click or press Ctrl+Shift+H to show.'
+        : 'Hidden. Click to show.';
+    overlay.classList.toggle('visible', manualBlur ?? autoBlur());
+};
+
+// Change an automatic input; a manual override only lasts until the automatic
+// answer changes.
+const setAuto = (change) => {
+    const before = autoBlur();
+    change();
+    if (autoBlur() !== before) manualBlur = null;
+    renderBlur();
+};
+
+const applyShareMute = () => {
+    if (!MUTE_WHILE_SHARING) return;
+    const video = getVideo();
+    if (teamsSharing) {
+        if (video && !video.muted) {
+            video.muted = true;
+            mutedForShare = true;
+        }
+    } else if (mutedForShare) {
+        if (video) video.muted = false;
+        mutedForShare = false;
+    }
+};
+
+const setTeamsSharing = (sharing) => {
+    if (sharing === teamsSharing) return;
+    setAuto(() => { teamsSharing = sharing; });
+    applyShareMute();
+};
+
+// document.hasFocus() stays true while focus is inside an embedded frame (like
+// live chat), so that doesn't count as leaving. The poll catches focus leaving
+// from inside such a frame, which fires no event on this window.
+const checkFocus = () => {
+    if (!BLUR_ON_FOCUS_LOSS) return;
+    const unfocused = !document.hasFocus();
+    if (unfocused !== windowUnfocused) setAuto(() => { windowUnfocused = unfocused; });
+};
+window.addEventListener('blur', () => setTimeout(checkFocus, 0));
+window.addEventListener('focus', checkFocus);
+document.addEventListener('visibilitychange', checkFocus);
+setInterval(checkFocus, 500);
+
+document.addEventListener('fullscreenchange', renderBlur);
+
+// A new video during a share may come in unmuted
+document.addEventListener('loadeddata', () => {
+    if (teamsSharing) applyShareMute();
+}, true);
+
+// The background worker publishes share state and shortcut presses here.
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'session') return;
+    if (changes.teamsSharing) setTeamsSharing(changes.teamsSharing.newValue === true);
+    if (changes.blurToggleAt) {
+        manualBlur = !(manualBlur ?? autoBlur());
+        renderBlur();
+    }
+});
+
+// Fails if the worker hasn't granted access yet this session; onChanged picks
+// the state up once it does.
+chrome.storage.session.get({ teamsSharing: false })
+    .then((data) => setTeamsSharing(data.teamsSharing === true))
+    .catch(() => {});
+
+checkFocus();
+renderBlur();

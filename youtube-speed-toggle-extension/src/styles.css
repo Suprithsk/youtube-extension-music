@@ -42,3 +42,40 @@
     transform: scale(1.08);
     background: rgba(204, 0, 0, 0.9);
 }
+
+/* Privacy blur: covers the whole page while sharing or when you switch away */
+#yt-privacy-blur {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(30px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    cursor: pointer;
+    /* Stay visible until the fade-out finishes, then drop out entirely */
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+}
+
+#yt-privacy-blur.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition: opacity 0.2s ease, visibility 0s;
+}
+
+#yt-privacy-blur .yt-privacy-hint {
+    max-width: 80%;
+    padding: 8px 16px;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.85);
+    font-family: "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    text-align: center;
+}

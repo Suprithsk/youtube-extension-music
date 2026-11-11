@@ -10,6 +10,7 @@ A Chrome extension that sets YouTube playback speed automatically: **music video
 - Re-applies the speed when you move to the next video (YouTube resets it otherwise).
 - A small badge at the top of the page shows what was detected and the speed in use — `Music video detected 1x`, `Education detected 1.5x` — and stays visible while you watch.
 - Manual speed changes from YouTube's own menu are respected — the extension stops interfering a few seconds after the video loads.
+- **Privacy blur:** YouTube is blurred and muted while you share your screen in Teams on the web, and blurred whenever you switch to another app or tab. See [Privacy blur](#privacy-blur).
 
 ## Installation
 
@@ -38,11 +39,28 @@ If both fail, the video gets the default 1.5x.
 - Only `/watch` pages are touched. Shorts and embeds are left alone.
 - To change the speeds, edit `MUSIC_RATE` and `NON_MUSIC_CYCLE` at the top of `src/content.js`.
 
+## Privacy blur
+
+The whole YouTube page fades behind a heavy blur when:
+
+- **You share your screen in Teams** (in Chrome: `teams.cloud.microsoft`, `teams.microsoft.com`, `teams.live.com`). Every open YouTube tab blurs as soon as the share starts and clears when it stops, whether you stop it from Teams or from Chrome's "Stop sharing" bar. YouTube is also **muted** during the share, so "Include sound" doesn't broadcast your music, and unmuted afterwards.
+- **The YouTube window loses focus**: you switch to another app or tab, or click Chrome's address bar.
+
+To show the page anyway, click the blur or press **Ctrl+Shift+H**. The same shortcut blurs the page on demand. A manual choice lasts until the automatic state next changes (for example, the share ends).
+
+Options at the top of the privacy section in `src/content.js`:
+
+- `BLUR_ON_FOCUS_LOSS = false` to blur only during Teams shares (useful if YouTube sits on a second monitor).
+- `MUTE_WHILE_SHARING = false` to keep the sound on.
+
+**How the share is detected:** a small script on the Teams page wraps the browser's screen-capture call (`getDisplayMedia`) and watches the captured tracks to see when the share ends. It only reports "sharing" or "not sharing" to the extension. Shares from the Teams desktop app, or other meeting tools, aren't detected, though focus-loss blur usually covers those.
+
 ## Development
 
 - `src/content.js` — category detection, speed logic, and the shortcut cycle.
-- `src/background.js` — service worker that relays the keyboard shortcut.
-- `src/styles.css` — the speed badge.
+- `src/background.js` — service worker that relays the keyboard shortcuts and tracks Teams share state.
+- `src/teams-hook.js` / `src/teams-relay.js` — detect screen sharing on Teams pages and report it.
+- `src/styles.css` — the speed badge and the privacy blur.
 - `manifest.json` — extension configuration.
 - `icons/` — extension icons.
 
